@@ -1,0 +1,64 @@
+version: "3.7"
+services:
+
+#ifrastructure
+  postgres:
+    image: "postgres:12"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: admin
+      POSTGRES_USER: admin
+      POSTGRES_DB: TicTacToe
+    ports:
+      - "6432:5432"
+#
+#  localstack:
+#    image: localstack/localstack
+#    ports:
+#      - "4566-4599:4566-4599"
+##      - "${PORT_WEB_UI-8080}:${PORT_WEB_UI-8080}"
+#    environment:
+#      - SERVICES=sqs,s3,kinesis
+#      - DEBUG=${DEBUG- }
+#      - DATA_DIR=${DATA_DIR- }
+#      - PORT_WEB_UI=${PORT_WEB_UI- }
+#      - LAMBDA_EXECUTOR=${LAMBDA_EXECUTOR- }
+#      - KINESIS_ERROR_PROBABILITY=${KINESIS_ERROR_PROBABILITY- }
+#      - DOCKER_HOST=unix:///var/run/docker.sock
+#    volumes:
+#      - localstack-dir:/tmp/localstack
+
+  app:
+    image: "app-v0.1:latest"
+    build:
+      context: ../
+      dockerfile: ./devops/images/Dockerfile
+#    entrypoint: sleep 100d
+    restart: on-failure
+    environment:
+      WEB_SERVER_AUTO_RELOAD: "False"
+      DEBUG: "True"
+      PG_DB: set-value-here
+      PG_USER: set-value-here
+      PG_PASSWORD: set-value-here
+      PG_HOST: postgres
+      LOCAL: "True"
+      IN_COMPOSE: "True"
+    volumes:
+      - type: bind
+        source:  ./src
+        target: /src/src
+    depends_on:
+      - postgres
+
+#deployments
+
+#jobs
+
+
+volumes:
+  pg-data:
+    driver: local
+  localstack-dir:
+    driver: local

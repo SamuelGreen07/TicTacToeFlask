@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+flask-sqlalchemy = "*"
+psycopg2-binary = "*"
+alembic = "*"
+flask-httpauth = "*"
+marshmallow = "*"
+marshmallow-validators = "*"
+wtforms = "*"
+email-validator = "*"
+flask = {extras = ["async"], version = "*"}
+passlib = "*"
+asyncpg = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.9"
