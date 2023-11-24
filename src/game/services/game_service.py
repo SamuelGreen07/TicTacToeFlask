@@ -46,7 +46,6 @@ class GameService:
             query = select(Game).where(Game.id == game_id)
             result = await session.execute(query)
             game = result.scalars().first()
-            session.close()
         return game
 
     async def make_move(self, user, row_id, game_id):
@@ -81,12 +80,43 @@ class GameService:
 
                         )
                         session.add(move)
+
+                        winner, is_game_over = self.check_tic_tac_toe(board)
+                        if is_game_over:
+                            game.winner = user.id
+                            game.status = GameStatus.FINISHED
                         await session.commit()
+
             except Exception as e:
                 await session.rollback()
                 raise e
 
-        return True
+        return True, is_game_over
+
+    def check_tic_tac_toe(self, board):
+        def convert_to_2d(board):
+            return [[board[str(i * 3 + j + 1)] for j in range(3)] for i in range(3)]
+
+        def is_winner(board, player):
+            for i in range(3):
+                if all(board[i][j] == player for j in range(3)) or all(board[j][i] == player for j in range(3)):
+                    return True
+            if all(board[i][i] == player for i in range(3)) or all(board[i][2 - i] == player for i in range(3)):
+                return True
+            return False
+
+        def is_draw(board):
+            return all(cell in ['p1', 'p2'] for row in board for cell in row)
+
+        board_2d = convert_to_2d(board)
+        if is_winner(board_2d, 'p1'):
+            return 'p1', True
+        elif is_winner(board_2d, 'p2'):
+            return 'p2', True
+        elif is_draw(board_2d):
+            return None, True
+        else:
+            return None, False
 
 
 game_service = GameService()
