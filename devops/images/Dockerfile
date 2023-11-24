@@ -3,8 +3,10 @@ ARG PIPENV_CUSTOM_VERSION="2021.5.29"
 FROM ${PYTHON_IMAGE}:3.9
 
 ENV APP_USER=samuel
-ENV APP_DIR=/src
+ENV APP_DIR=/app
 ARG PIPENV_CUSTOM_VERSION
+
+ENV PYTHONPATH="${APP_DIR}:${APP_DIR}/src:${PYTHONPATH}"
 
 COPY ./devops/images/entrypoint.sh /usr/local/bin/
 
@@ -21,8 +23,9 @@ CMD ["run-server"]
 COPY --chown=$APP_USER:$APP_USER Pipfile Pipfile.lock ${APP_DIR}/
 USER ${APP_USER}
 
-# Install requirements and build
 RUN cd ${APP_DIR} \
     && pipenv install
 
-COPY --chown=${APP_USER}:${APP_USER} . ${APP_DIR}
+COPY --chown=${APP_USER}:${APP_USER} app.py ${APP_DIR}/
+
+COPY --chown=${APP_USER}:${APP_USER} src/ ${APP_DIR}/src/

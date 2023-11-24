@@ -3,25 +3,11 @@ import os
 
 os.environ.setdefault("SETTINGS_FILE", "settings.default")
 
-import subprocess
 import os
-
-
-def print_directory_tree(startpath):
-    process = subprocess.Popen(["find", startpath, "-maxdepth", "2"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
-
-    if process.returncode == 0:
-        print(stdout.decode())
-    else:
-        print(f"Error: {stderr.decode()}")
-
-
-print_directory_tree("/src")
 
 from flask import Flask
 
-from services.db_wrapper import DataBaseWrapper
+from src.services.db_wrapper import DataBaseWrapper
 from urls import *
 
 app = Flask(__name__)
